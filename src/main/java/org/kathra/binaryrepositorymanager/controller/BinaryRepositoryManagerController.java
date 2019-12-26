@@ -26,7 +26,9 @@ import javax.enterprise.context.ApplicationScoped;
 import org.kathra.binaryrepositorymanager.Config;
 import org.kathra.binaryrepositorymanager.model.ContainersRepository;
 import org.kathra.binaryrepositorymanager.model.ContainersRepositoryMetadata;
+import org.kathra.binaryrepositorymanager.model.Credential;
 import org.kathra.binaryrepositorymanager.service.BinaryRepositoryManagerService;
+import org.kathra.core.model.BinaryRepository;
 import org.kathra.core.model.Membership;
 import org.kathra.utils.ApiException;
 import org.kathra.utils.ApiResponse;
@@ -294,5 +296,45 @@ public class BinaryRepositoryManagerController implements BinaryRepositoryManage
   }
   public void setHarborUrl(String url){
     this.harborUrl = url;
+  }
+
+  @Override
+  public ApiResponse addBinaryRepository(BinaryRepository binaryRepository) throws Exception {
+    return null;
+  }
+
+  @Override
+  public ApiResponse addBinaryRepositoryMembership(String binaryRepoId, Membership binaryRepositoryMembership) throws Exception {
+    return null;
+  }
+
+  @Override
+  public Credential credentialsIdGet(String id) throws Exception {
+    return null;
+  }
+
+  @Override
+  public List<BinaryRepository> getBinaryRepositories() throws Exception {
+    return null;
+  }
+
+  @Override
+  public BinaryRepository getBinaryRepository(String binaryRepoId) throws Exception {
+    return null;
+  }
+
+  @Override
+  public List<Membership> getBinaryRepositoryMembership(String binaryRepoId) throws Exception {
+    return null;
+  }
+
+  @Override
+  public ApiResponse updateBinaryRepository(String binaryRepoId, BinaryRepository binaryRepository) throws Exception {
+    return null;
+  }
+
+  @Override
+  public ApiResponse updateBinaryRepositoryAttributes(String binaryRepoId, BinaryRepository binaryRepository) throws Exception {
+    return null;
   }
 }
