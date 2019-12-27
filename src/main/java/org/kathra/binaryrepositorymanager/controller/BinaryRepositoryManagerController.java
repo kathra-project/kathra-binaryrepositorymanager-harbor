@@ -27,7 +27,7 @@ import org.kathra.binaryrepositorymanager.Config;
 import org.kathra.binaryrepositorymanager.model.ContainersRepository;
 import org.kathra.binaryrepositorymanager.model.ContainersRepositoryMetadata;
 import org.kathra.binaryrepositorymanager.model.Credential;
-import org.kathra.binaryrepositorymanager.service.BinaryRepositoryManagerService;
+import org.kathra.binaryrepositorymanager.service.BinaryrepositorymanagerService;
 import org.kathra.core.model.BinaryRepository;
 import org.kathra.core.model.Membership;
 import org.kathra.utils.ApiException;
@@ -47,7 +47,7 @@ import com.mashape.unirest.http.JsonNode;
 @Named("BinaryRepositoryManagerController")
 @ApplicationScoped
 @Eager
-public class BinaryRepositoryManagerController implements BinaryRepositoryManagerService {
+public class BinaryRepositoryManagerController implements BinaryrepositorymanagerService {
   
   private Config config;
   private String harborUrl;
