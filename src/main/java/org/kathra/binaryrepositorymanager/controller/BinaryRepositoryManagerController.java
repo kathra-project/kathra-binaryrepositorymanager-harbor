@@ -24,8 +24,6 @@ import javax.inject.Named;
 import javax.enterprise.context.ApplicationScoped;
 
 import org.kathra.binaryrepositorymanager.Config;
-import org.kathra.binaryrepositorymanager.model.BinaryRepository;
-import org.kathra.binaryrepositorymanager.model.BinaryRepositoryMetadata;
 import org.kathra.binaryrepositorymanager.model.Credential;
 import org.kathra.binaryrepositorymanager.service.BinaryRepositoryManagerService;
 import org.kathra.core.model.BinaryRepository;
@@ -108,7 +106,7 @@ public class BinaryRepositoryManagerController implements BinaryRepositoryManage
   * @param binaryRepositoryMembership Membership object to add to the containers repository (required)
   * @return Membership
   */
-  public Membership addBinaryRepositoryMembership(final String containersRepoId, final Membership binaryRepositoryMembership) throws Exception {
+  public void addBinaryRepositoryMembership(final String containersRepoId, final Membership binaryRepositoryMembership) throws Exception {
     
     if(binaryRepositoryMembership.getMemberType() == null ||
        binaryRepositoryMembership.getRole() == null){
@@ -188,8 +186,9 @@ public class BinaryRepositoryManagerController implements BinaryRepositoryManage
         throw new ApiException(500, "Internal Server Error");
       }
       
-      Membership member = GsonUtils.gson.fromJson(stringResponse.getData(), Membership.class);
-      return member;
+      //Membership member = GsonUtils.gson.fromJson(stringResponse.getData(), Membership.class);
+      //return member;
+
     }
     else {
       throw new ApiException(404, "Repository not found");
@@ -211,8 +210,9 @@ public class BinaryRepositoryManagerController implements BinaryRepositoryManage
     for(int i=0; i<projectsArray.length(); i++){
       if(!projectsArray.getJSONObject(i).get("name").equals("library")){
         BinaryRepository repo = new BinaryRepository();
-        BinaryRepositoryMetadata meta = new BinaryRepositoryMetadata();
         JSONObject currentRepo = projectsArray.getJSONObject(i);
+        /*
+        BinaryRepositoryMetadata meta = new BinaryRepositoryMetadata();
         JSONObject repoMetadatas = currentRepo.getJSONObject("metadata");
         meta.setContentTrustEnabled(
           ifObjHasKeyGetValueOrDefault(repoMetadatas, "enable_content_trust", "false")
@@ -229,9 +229,9 @@ public class BinaryRepositoryManagerController implements BinaryRepositoryManage
         meta.setPreventVulnerableFromRunning(
           ifObjHasKeyGetValueOrDefault(repoMetadatas, "prevent_vulnerable_images_from_running", "false")
         );
-      
+        */
         repo.setName(currentRepo.get("name").toString());
-        repo.setMetadata(meta);
+        //repo.setMetadata(meta);
 
         repos.add(repo);
       }
@@ -239,17 +239,7 @@ public class BinaryRepositoryManagerController implements BinaryRepositoryManage
 
     return repos;
   }
-  
-  /**
-  * Retrieve a specific containers repository
-  * 
-  * @param containersRepoId The id of the containers repository to retrieve (required)
-  * @return BinaryRepository
-  */
-  public BinaryRepository getBinaryRepository(String containersRepoId) throws Exception {
-    //TODO: Implement this method
-    throw new UnsupportedOperationException("No implementation could be found for the requested operation.");
-  }
+
   
   /**
   * Retrieve a list of users and groups membership values for the specified containers repository
@@ -261,30 +251,7 @@ public class BinaryRepositoryManagerController implements BinaryRepositoryManage
     //TODO: Implement this method
     throw new UnsupportedOperationException("No implementation could be found for the requested operation.");
   }
-  
-  /**
-  * Fully update a registered containers repository
-  * 
-  * @param containersRepoId The id of the containers repository to replace (required)
-  * @param binaryRepository Containers repository object to use to replace existing resource (required)
-  * @return BinaryRepository
-  */
-  public BinaryRepository updateBinaryRepository(String containersRepoId, BinaryRepository binaryRepository) throws Exception {
-    //TODO: Implement this method
-    throw new UnsupportedOperationException("No implementation could be found for the requested operation.");
-  }
-  
-  /**
-  * Partially update a registered containers repository
-  * 
-  * @param containersRepoId The id of the containers repository to partially update (required)
-  * @param binaryRepository Containers repository object to use to patch existing resource (required)
-  * @return ApiResponse
-  */
-  public ApiResponse updateBinaryRepositoryAttributes(String containersRepoId, BinaryRepository binaryRepository) throws Exception {
-    //TODO: Implement this method
-    throw new UnsupportedOperationException("No implementation could be found for the requested operation.");
-  }
+
   
   private String ifObjHasKeyGetValueOrDefault(JSONObject obj, String key, String defaultValue){
     if(obj.has(key)) return obj.getString(key);
@@ -299,16 +266,6 @@ public class BinaryRepositoryManagerController implements BinaryRepositoryManage
   }
 
   @Override
-  public BinaryRepository addBinaryRepository(BinaryRepository binaryRepository) throws Exception {
-    return null;
-  }
-
-  @Override
-  public void addBinaryRepositoryMembership(String binaryRepoId, Membership binaryRepositoryMembership) throws Exception {
-    return null;
-  }
-
-  @Override
   public Credential credentialsIdGet(String id) throws Exception {
     return null;
   }
@@ -320,11 +277,6 @@ public class BinaryRepositoryManagerController implements BinaryRepositoryManage
 
   @Override
   public BinaryRepository getBinaryRepository(String binaryRepoId) throws Exception {
-    return null;
-  }
-
-  @Override
-  public List<Membership> getBinaryRepositoryMembership(String binaryRepoId) throws Exception {
     return null;
   }
 
