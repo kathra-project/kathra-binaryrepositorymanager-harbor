@@ -24,10 +24,10 @@ import javax.inject.Named;
 import javax.enterprise.context.ApplicationScoped;
 
 import org.kathra.binaryrepositorymanager.Config;
-import org.kathra.binaryrepositorymanager.model.ContainersRepository;
-import org.kathra.binaryrepositorymanager.model.ContainersRepositoryMetadata;
+import org.kathra.binaryrepositorymanager.model.BinaryRepository;
+import org.kathra.binaryrepositorymanager.model.BinaryRepositoryMetadata;
 import org.kathra.binaryrepositorymanager.model.Credential;
-import org.kathra.binaryrepositorymanager.service.BinaryrepositorymanagerService;
+import org.kathra.binaryrepositorymanager.service.BinaryRepositoryManagerService;
 import org.kathra.core.model.BinaryRepository;
 import org.kathra.core.model.Membership;
 import org.kathra.utils.ApiException;
@@ -47,7 +47,7 @@ import com.mashape.unirest.http.JsonNode;
 @Named("BinaryRepositoryManagerController")
 @ApplicationScoped
 @Eager
-public class BinaryRepositoryManagerController implements BinaryrepositorymanagerService {
+public class BinaryRepositoryManagerController implements BinaryRepositoryManagerService {
   
   private Config config;
   private String harborUrl;
@@ -66,16 +66,16 @@ public class BinaryRepositoryManagerController implements Binaryrepositorymanage
   /**
   * Add a containers repository
   * 
-  * @param containersRepository Containers repository object to be created (required)
-  * @return ContainersRepository
+  * @param binaryRepository Containers repository object to be created (required)
+  * @return BinaryRepository
   * HttpCodes : 201 Created, 400 Bad request, 401 Unauthorized, 409 Conflict(Already existing), 500 Internal Server Error
   */
-  public ContainersRepository addContainersRepository(ContainersRepository containersRepository) throws Exception {
+  public BinaryRepository addBinaryRepository(BinaryRepository binaryRepository) throws Exception {
     String endpointUrl = String.join("/", this.harborUrl, "projects");
     // Genericized "project_name" to "name" in the API, so we have to replace it here to match Harbor API 
-    String jsonStringRepo = GsonUtils.toJson(containersRepository).replace("name", "project_name");
+    String jsonStringRepo = GsonUtils.toJson(binaryRepository).replace("name", "project_name");
     
-    ApiResponse<String> stringResponse = this.harborClient.addRepository(containersRepository.getName(), jsonStringRepo, endpointUrl);
+    ApiResponse<String> stringResponse = this.harborClient.addRepository(binaryRepository.getName(), jsonStringRepo, endpointUrl);
     // Cast response to Repository
     String repoString = stringResponse.getData()
       .replace("project_id", "id")
@@ -97,7 +97,7 @@ public class BinaryRepositoryManagerController implements Binaryrepositorymanage
       throw new ApiException(500, "Internal Server Error");
     }
     
-    ContainersRepository repo = GsonUtils.gson.fromJson(repoString, ContainersRepository.class);
+    BinaryRepository repo = GsonUtils.gson.fromJson(repoString, BinaryRepository.class);
     return repo;
   }
   
@@ -105,13 +105,13 @@ public class BinaryRepositoryManagerController implements Binaryrepositorymanage
   * Add a containers repository membership for a user or group
   * 
   * @param containersRepoId The id of the containers repository to retrieve (required)
-  * @param containersRepositoryMembership Membership object to add to the containers repository (required)
+  * @param binaryRepositoryMembership Membership object to add to the containers repository (required)
   * @return Membership
   */
-  public Membership addContainersRepositoryMembership(final String containersRepoId, final Membership containersRepositoryMembership) throws Exception {
+  public Membership addBinaryRepositoryMembership(final String containersRepoId, final Membership binaryRepositoryMembership) throws Exception {
     
-    if(containersRepositoryMembership.getMemberType() == null ||
-       containersRepositoryMembership.getRole() == null){
+    if(binaryRepositoryMembership.getMemberType() == null ||
+       binaryRepositoryMembership.getRole() == null){
       
       throw new ApiException(400, "Bad request");
     }
@@ -138,14 +138,14 @@ public class BinaryRepositoryManagerController implements Binaryrepositorymanage
        * Harbor behaves differently if the group to add to membership already exists
        * This implementation takes care of this behaviour, but WILL NOT WORK if the group does not exist.
        */
-      if(containersRepositoryMembership.getMemberType().getValue().equals("group")){
+      if(binaryRepositoryMembership.getMemberType().getValue().equals("group")){
         String groupsEndpoint = String.join("/", this.harborUrl, "usergroups");
         
         ApiResponse<JsonNode> groups = this.harborClient.getGroups(groupsEndpoint);
 
         JSONArray groupsArray = groups.getData().getArray();
         for(int i=0; i<groupsArray.length(); i++){
-          if(String.valueOf(groupsArray.getJSONObject(i).get("group_name")).equals(containersRepositoryMembership.getMemberName())) {
+          if(String.valueOf(groupsArray.getJSONObject(i).get("group_name")).equals(binaryRepositoryMembership.getMemberName())) {
             targetGroup = groupsArray.getJSONObject(i);
             break;
           }
@@ -167,13 +167,13 @@ public class BinaryRepositoryManagerController implements Binaryrepositorymanage
       }
       else {
         targetType = "username";
-        target.put(targetType, containersRepositoryMembership.getMemberName());
+        target.put(targetType, binaryRepositoryMembership.getMemberName());
       }
 
       HashMap<String, Object> harborMembership = new HashMap<String, Object>();
       // Role: GUEST:0, CONTRIBUTOR:1, MANAGER:2
-      harborMembership.put("role_id", containersRepositoryMembership.getRole().ordinal());
-      harborMembership.put("member_" + containersRepositoryMembership.getMemberType(), target);
+      harborMembership.put("role_id", binaryRepositoryMembership.getRole().ordinal());
+      harborMembership.put("member_" + binaryRepositoryMembership.getMemberType(), target);
       String jsonObject = GsonUtils.toJson(harborMembership);
       
       ApiResponse<String> stringResponse = this.harborClient.addRepositoryMembership(jsonObject, endpointUrl);
@@ -182,7 +182,7 @@ public class BinaryRepositoryManagerController implements Binaryrepositorymanage
         throw new ApiException(401, "Unauthorized");
       }
       else if(stringResponse.getStatusCode() == 409) {
-        throw new ApiException(409, "Membership already exists", null, GsonUtils.toJson(containersRepositoryMembership));
+        throw new ApiException(409, "Membership already exists", null, GsonUtils.toJson(binaryRepositoryMembership));
       }
       else if(stringResponse.getStatusCode() == 500) {
         throw new ApiException(500, "Internal Server Error");
@@ -199,19 +199,19 @@ public class BinaryRepositoryManagerController implements Binaryrepositorymanage
   /**
   * Retrieve a list of existing containers repositories for authenticated user
   * 
-  * @return List<ContainersRepository>
+  * @return List<BinaryRepository>
   */
-  public List<ContainersRepository> getContainersRepositories() throws Exception {
+  public List<BinaryRepository> getContainersRepositories() throws Exception {
     String projectsEndpoint = String.join("/", this.harborUrl, "projects");
     
     ApiResponse<JsonNode> projects = this.harborClient.getRepositories(projectsEndpoint);
     
-    List<ContainersRepository> repos = new ArrayList<ContainersRepository>();
+    List<BinaryRepository> repos = new ArrayList<BinaryRepository>();
     JSONArray projectsArray = projects.getData().getArray();
     for(int i=0; i<projectsArray.length(); i++){
       if(!projectsArray.getJSONObject(i).get("name").equals("library")){
-        ContainersRepository repo = new ContainersRepository();
-        ContainersRepositoryMetadata meta = new ContainersRepositoryMetadata();
+        BinaryRepository repo = new BinaryRepository();
+        BinaryRepositoryMetadata meta = new BinaryRepositoryMetadata();
         JSONObject currentRepo = projectsArray.getJSONObject(i);
         JSONObject repoMetadatas = currentRepo.getJSONObject("metadata");
         meta.setContentTrustEnabled(
@@ -223,7 +223,7 @@ public class BinaryRepositoryManagerController implements Binaryrepositorymanage
         meta.setScanImagesOnPush(
           ifObjHasKeyGetValueOrDefault(repoMetadatas, "automatically_scan_images_on_push", "false")
         );
-        meta.setVulnerableThreshold(ContainersRepositoryMetadata.VulnerableThresholdEnum.fromValue(
+        meta.setVulnerableThreshold(BinaryRepositoryMetadata.VulnerableThresholdEnum.fromValue(
           ifObjHasKeyGetValueOrDefault(repoMetadatas, "prevent_vulnerable_images_from_running_severity", "HIGH"))
         );
         meta.setPreventVulnerableFromRunning(
@@ -244,9 +244,9 @@ public class BinaryRepositoryManagerController implements Binaryrepositorymanage
   * Retrieve a specific containers repository
   * 
   * @param containersRepoId The id of the containers repository to retrieve (required)
-  * @return ContainersRepository
+  * @return BinaryRepository
   */
-  public ContainersRepository getContainersRepository(String containersRepoId) throws Exception {
+  public BinaryRepository getBinaryRepository(String containersRepoId) throws Exception {
     //TODO: Implement this method
     throw new UnsupportedOperationException("No implementation could be found for the requested operation.");
   }
@@ -257,7 +257,7 @@ public class BinaryRepositoryManagerController implements Binaryrepositorymanage
   * @param containersRepoId The id of the containers repository to retrieve (required)
   * @return List<Membership>
   */
-  public List<Membership> getContainersRepositoryMembership(String containersRepoId) throws Exception {
+  public List<Membership> getBinaryRepositoryMembership(String containersRepoId) throws Exception {
     //TODO: Implement this method
     throw new UnsupportedOperationException("No implementation could be found for the requested operation.");
   }
@@ -266,10 +266,10 @@ public class BinaryRepositoryManagerController implements Binaryrepositorymanage
   * Fully update a registered containers repository
   * 
   * @param containersRepoId The id of the containers repository to replace (required)
-  * @param containersRepository Containers repository object to use to replace existing resource (required)
-  * @return ContainersRepository
+  * @param binaryRepository Containers repository object to use to replace existing resource (required)
+  * @return BinaryRepository
   */
-  public ContainersRepository updateContainersRepository(String containersRepoId, ContainersRepository containersRepository) throws Exception {
+  public BinaryRepository updateBinaryRepository(String containersRepoId, BinaryRepository binaryRepository) throws Exception {
     //TODO: Implement this method
     throw new UnsupportedOperationException("No implementation could be found for the requested operation.");
   }
@@ -278,10 +278,10 @@ public class BinaryRepositoryManagerController implements Binaryrepositorymanage
   * Partially update a registered containers repository
   * 
   * @param containersRepoId The id of the containers repository to partially update (required)
-  * @param containersRepository Containers repository object to use to patch existing resource (required)
+  * @param binaryRepository Containers repository object to use to patch existing resource (required)
   * @return ApiResponse
   */
-  public ApiResponse updateContainersRepositoryAttributes(String containersRepoId, ContainersRepository containersRepository) throws Exception {
+  public ApiResponse updateBinaryRepositoryAttributes(String containersRepoId, BinaryRepository binaryRepository) throws Exception {
     //TODO: Implement this method
     throw new UnsupportedOperationException("No implementation could be found for the requested operation.");
   }
@@ -299,12 +299,12 @@ public class BinaryRepositoryManagerController implements Binaryrepositorymanage
   }
 
   @Override
-  public ApiResponse addBinaryRepository(BinaryRepository binaryRepository) throws Exception {
+  public BinaryRepository addBinaryRepository(BinaryRepository binaryRepository) throws Exception {
     return null;
   }
 
   @Override
-  public ApiResponse addBinaryRepositoryMembership(String binaryRepoId, Membership binaryRepositoryMembership) throws Exception {
+  public void addBinaryRepositoryMembership(String binaryRepoId, Membership binaryRepositoryMembership) throws Exception {
     return null;
   }
 
@@ -329,12 +329,12 @@ public class BinaryRepositoryManagerController implements Binaryrepositorymanage
   }
 
   @Override
-  public ApiResponse updateBinaryRepository(String binaryRepoId, BinaryRepository binaryRepository) throws Exception {
+  public BinaryRepository updateBinaryRepository(String binaryRepoId, BinaryRepository binaryRepository) throws Exception {
     return null;
   }
 
   @Override
-  public ApiResponse updateBinaryRepositoryAttributes(String binaryRepoId, BinaryRepository binaryRepository) throws Exception {
+  public BinaryRepository updateBinaryRepositoryAttributes(String binaryRepoId, BinaryRepository binaryRepository) throws Exception {
     return null;
   }
 }

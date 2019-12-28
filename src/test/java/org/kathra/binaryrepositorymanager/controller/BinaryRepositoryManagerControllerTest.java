@@ -28,8 +28,8 @@
 // import org.mockito.junit.jupiter.MockitoSettings;
 // import org.mockito.quality.Strictness;
 
-// import org.kathra.binaryrepositorymanager.model.ContainersRepository;
-// import org.kathra.binaryrepositorymanager.model.ContainersRepositoryMetadata;
+// import org.kathra.binaryrepositorymanager.model.BinaryRepository;
+// import org.kathra.binaryrepositorymanager.model.BinaryRepositoryMetadata;
 // import org.kathra.core.model.Membership;
 // import org.kathra.utils.ApiResponse;
 // import org.kathra.utils.serialization.GsonUtils;
@@ -87,45 +87,45 @@
 //   public void given_nominal_args_when_creating_repository_then_works() throws Exception {
 //     String endpointUrl = String.join("/", harborUrl, "projects");
     
-//     ContainersRepository repoToCreate = mockRepoToCreate("myRepo");
+//     BinaryRepository repoToCreate = mockRepoToCreate("myRepo");
 //     String jsonStringRepo = mockTransformedRepoToCreate(repoToCreate);
 
 //     ApiResponse<String> addRepoResponse = new ApiResponse<String>(201, null, "");
     
 //     Mockito.when(harborClient.addRepository(jsonStringRepo, endpointUrl)).thenReturn(addRepoResponse);
     
-//     assertThat("The response HTTP Status Code is 201(Created)", underTest.addContainersRepository(repoToCreate).getStatusCode(), is(201));
-//     assertThat("The response informs the resource have been created", underTest.addContainersRepository(repoToCreate).getData(), is(""));
+//     assertThat("The response HTTP Status Code is 201(Created)", underTest.addBinaryRepository(repoToCreate).getStatusCode(), is(201));
+//     assertThat("The response informs the resource have been created", underTest.addBinaryRepository(repoToCreate).getData(), is(""));
 //   }
 
 //   @Test
 //   public void given_nominal_args_when_creating_repository_then_already_exists() throws Exception {
 //     String endpointUrl = String.join("/", harborUrl, "projects");
     
-//     ContainersRepository repoToCreate = mockRepoToCreate("myRepo");
+//     BinaryRepository repoToCreate = mockRepoToCreate("myRepo");
 //     String jsonStringRepo = mockTransformedRepoToCreate(repoToCreate);
 
 //     ApiResponse<String> addRepoResponse = new ApiResponse<String>(409, null, "\n");
     
 //     Mockito.when(harborClient.addRepository(jsonStringRepo, endpointUrl)).thenReturn(addRepoResponse);
     
-//     assertThat("The response HTTP Status Code is 409(Conflict)", underTest.addContainersRepository(repoToCreate).getStatusCode(), is(409));
-//     assertThat("The response informs the resource to create already exists", underTest.addContainersRepository(repoToCreate).getData(), is("\n"));
+//     assertThat("The response HTTP Status Code is 409(Conflict)", underTest.addBinaryRepository(repoToCreate).getStatusCode(), is(409));
+//     assertThat("The response informs the resource to create already exists", underTest.addBinaryRepository(repoToCreate).getData(), is("\n"));
 //   }
 
 //   @Test
 //   public void given_bad_request_when_creating_repository_then_fails() throws Exception {
 //     String endpointUrl = String.join("/", harborUrl, "projects");
     
-//     ContainersRepository repoToCreate = mockRepoToCreate("");
+//     BinaryRepository repoToCreate = mockRepoToCreate("");
 //     String jsonStringRepo = mockTransformedRepoToCreate(repoToCreate);
 
 //     ApiResponse<String> addRepoResponse = new ApiResponse<String>(400, null, "invalid request: Project name is illegal in length. (greater than 255 or less than 2)\n");
     
 //     Mockito.when(harborClient.addRepository(jsonStringRepo, endpointUrl)).thenReturn(addRepoResponse);
     
-//     assertThat("The response HTTP Status Code is 400(Bad Request)", underTest.addContainersRepository(repoToCreate).getStatusCode(), is(400));
-//     assertThat("The response informs the resource request if malformed (repo name)", underTest.addContainersRepository(repoToCreate).getData(), containsString("invalid request"));
+//     assertThat("The response HTTP Status Code is 400(Bad Request)", underTest.addBinaryRepository(repoToCreate).getStatusCode(), is(400));
+//     assertThat("The response informs the resource request if malformed (repo name)", underTest.addBinaryRepository(repoToCreate).getData(), containsString("invalid request"));
 //   }
   
 //   @Test
@@ -157,11 +157,11 @@
 //     Mockito.when(harborClient.addRepositoryMembership(jsonTransformedGroupMembershipToCreate, membershipEndpointUrl)).thenReturn(addRepoMembershipResponse);
 //     Mockito.when(harborClient.addRepositoryMembership(jsonTransformedUserMembershipToCreate, membershipEndpointUrl)).thenReturn(addRepoMembershipResponse);
   
-//     assertThat("The response HTTP Status Code is 201(Created)", underTest.addContainersRepositoryMembership("myRepo", repoGroupMembershipToCreate).getStatusCode(), is(201));
-//     assertThat("The response informs the resource have been created", underTest.addContainersRepositoryMembership("myRepo", repoGroupMembershipToCreate).getData(), is(""));
+//     assertThat("The response HTTP Status Code is 201(Created)", underTest.addBinaryRepositoryMembership("myRepo", repoGroupMembershipToCreate).getStatusCode(), is(201));
+//     assertThat("The response informs the resource have been created", underTest.addBinaryRepositoryMembership("myRepo", repoGroupMembershipToCreate).getData(), is(""));
     
-//     assertThat("The response HTTP Status Code is 201(Created)", underTest.addContainersRepositoryMembership("myRepo", repoUserMembershipToCreate).getStatusCode(), is(201));
-//     assertThat("The response informs the resource have been created", underTest.addContainersRepositoryMembership("myRepo", repoUserMembershipToCreate).getData(), is(""));
+//     assertThat("The response HTTP Status Code is 201(Created)", underTest.addBinaryRepositoryMembership("myRepo", repoUserMembershipToCreate).getStatusCode(), is(201));
+//     assertThat("The response informs the resource have been created", underTest.addBinaryRepositoryMembership("myRepo", repoUserMembershipToCreate).getData(), is(""));
 //   }
 
 //   @Test
@@ -193,11 +193,11 @@
 //     Mockito.when(harborClient.addRepositoryMembership(jsonTransformedGroupMembershipToCreate, membershipEndpointUrl)).thenReturn(addRepoMembershipResponse);
 //     Mockito.when(harborClient.addRepositoryMembership(jsonTransformedUserMembershipToCreate, membershipEndpointUrl)).thenReturn(addRepoMembershipResponse);
   
-//     assertThat("The response HTTP Status Code is 409(Conflict)", underTest.addContainersRepositoryMembership("myRepo", repoGroupMembershipToCreate).getStatusCode(), is(409));
-//     assertThat("The response informs the resource have been created", underTest.addContainersRepositoryMembership("myRepo", repoGroupMembershipToCreate).getData(), containsString("Failed to add project member, already exist LDAP group or project member"));
+//     assertThat("The response HTTP Status Code is 409(Conflict)", underTest.addBinaryRepositoryMembership("myRepo", repoGroupMembershipToCreate).getStatusCode(), is(409));
+//     assertThat("The response informs the resource have been created", underTest.addBinaryRepositoryMembership("myRepo", repoGroupMembershipToCreate).getData(), containsString("Failed to add project member, already exist LDAP group or project member"));
     
-//     assertThat("The response HTTP Status Code is 409(Conflict)", underTest.addContainersRepositoryMembership("myRepo", repoUserMembershipToCreate).getStatusCode(), is(409));
-//     assertThat("The response informs the resource have been created", underTest.addContainersRepositoryMembership("myRepo", repoUserMembershipToCreate).getData(), containsString("Failed to add project member, already exist LDAP group or project member"));
+//     assertThat("The response HTTP Status Code is 409(Conflict)", underTest.addBinaryRepositoryMembership("myRepo", repoUserMembershipToCreate).getStatusCode(), is(409));
+//     assertThat("The response informs the resource have been created", underTest.addBinaryRepositoryMembership("myRepo", repoUserMembershipToCreate).getData(), containsString("Failed to add project member, already exist LDAP group or project member"));
 //   }
 
 //   @Test
@@ -231,16 +231,16 @@
 //     Mockito.when(harborClient.addRepositoryMembership(jsonTransformedGroupMembershipToCreate, membershipEndpointUrl)).thenReturn(addRepoMembershipResponse);
 //     Mockito.when(harborClient.addRepositoryMembership(jsonTransformedUserMembershipToCreate, membershipEndpointUrl)).thenReturn(addRepoMembershipResponse);
   
-//     assertThat("The response HTTP Status Code is 400(Bad request)", underTest.addContainersRepositoryMembership("myRepo", repoGroupMembershipToCreate).getStatusCode(), is(400));
-//     assertThat("The response informs the request failed", underTest.addContainersRepositoryMembership("myRepo", repoGroupMembershipToCreate).getData(), is("Bad request"));
+//     assertThat("The response HTTP Status Code is 400(Bad request)", underTest.addBinaryRepositoryMembership("myRepo", repoGroupMembershipToCreate).getStatusCode(), is(400));
+//     assertThat("The response informs the request failed", underTest.addBinaryRepositoryMembership("myRepo", repoGroupMembershipToCreate).getData(), is("Bad request"));
     
-//     assertThat("The response HTTP Status Code is 400(Bad request)", underTest.addContainersRepositoryMembership("myRepo", repoUserMembershipToCreate).getStatusCode(), is(400));
-//     assertThat("The response informs the request failed", underTest.addContainersRepositoryMembership("myRepo", repoUserMembershipToCreate).getData(), is("\n"));
+//     assertThat("The response HTTP Status Code is 400(Bad request)", underTest.addBinaryRepositoryMembership("myRepo", repoUserMembershipToCreate).getStatusCode(), is(400));
+//     assertThat("The response informs the request failed", underTest.addBinaryRepositoryMembership("myRepo", repoUserMembershipToCreate).getData(), is("\n"));
 //   }
 
-//   private ContainersRepository mockRepoToCreate(String repoName){
-//     ContainersRepository repo = new ContainersRepository();
-//     ContainersRepositoryMetadata meta = new ContainersRepositoryMetadata(){{ 
+//   private BinaryRepository mockRepoToCreate(String repoName){
+//     BinaryRepository repo = new BinaryRepository();
+//     BinaryRepositoryMetadata meta = new BinaryRepositoryMetadata(){{ 
 //       setIsPublic("false");
 //       setScanImagesOnPush("true");
 //       setContentTrustEnabled("false");
@@ -253,7 +253,7 @@
 //     return repo;
 //   }
 
-//   private String mockTransformedRepoToCreate(ContainersRepository repo){
+//   private String mockTransformedRepoToCreate(BinaryRepository repo){
 //     return GsonUtils.toJson(repo).replace("name", "project_name");
 //   }
 
