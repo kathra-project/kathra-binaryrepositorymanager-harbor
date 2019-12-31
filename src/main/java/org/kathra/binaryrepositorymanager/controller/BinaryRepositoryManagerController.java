@@ -30,6 +30,7 @@ import org.kathra.core.model.BinaryRepository;
 import org.kathra.core.model.Membership;
 import org.kathra.utils.ApiException;
 import org.kathra.utils.ApiResponse;
+import org.kathra.utils.KathraException;
 import org.kathra.utils.annotations.Eager;
 import org.kathra.utils.serialization.GsonUtils;
 
@@ -200,7 +201,7 @@ public class BinaryRepositoryManagerController implements BinaryRepositoryManage
   * 
   * @return List<BinaryRepository>
   */
-  public List<BinaryRepository> getContainersRepositories() throws Exception {
+  public List<BinaryRepository> getBinaryRepositories() throws Exception {
     String projectsEndpoint = String.join("/", this.harborUrl, "projects");
     
     ApiResponse<JsonNode> projects = this.harborClient.getRepositories(projectsEndpoint);
@@ -230,6 +231,8 @@ public class BinaryRepositoryManagerController implements BinaryRepositoryManage
           ifObjHasKeyGetValueOrDefault(repoMetadatas, "prevent_vulnerable_images_from_running", "false")
         );
         */
+        repo.setProvider("Harbor");
+        repo.setProviderId(currentRepo.get("name").toString());
         repo.setName(currentRepo.get("name").toString());
         //repo.setMetadata(meta);
 
@@ -267,26 +270,25 @@ public class BinaryRepositoryManagerController implements BinaryRepositoryManage
 
   @Override
   public Credential credentialsIdGet(String id) throws Exception {
-    return null;
-  }
-
-  @Override
-  public List<BinaryRepository> getBinaryRepositories() throws Exception {
-    return null;
+    return new Credential().username(config.getHarborUsername()).password(config.getHarborPassword());
   }
 
   @Override
   public BinaryRepository getBinaryRepository(String binaryRepoId) throws Exception {
-    return null;
+    return getBinaryRepositories().stream()
+            .filter(b -> b.getProviderId().equals(binaryRepoId)).findFirst()
+            .orElseThrow(() -> new KathraException("Unable to find binaryRepository", null, KathraException.ErrorCode.NOT_FOUND));
   }
 
   @Override
   public BinaryRepository updateBinaryRepository(String binaryRepoId, BinaryRepository binaryRepository) throws Exception {
-    return null;
+    //TODO: Implement this method
+    throw new UnsupportedOperationException("No implementation could be found for the requested operation.");
   }
 
   @Override
   public BinaryRepository updateBinaryRepositoryAttributes(String binaryRepoId, BinaryRepository binaryRepository) throws Exception {
-    return null;
+    //TODO: Implement this method
+    throw new UnsupportedOperationException("No implementation could be found for the requested operation.");
   }
 }
