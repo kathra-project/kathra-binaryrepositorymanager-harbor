@@ -34,10 +34,7 @@ import org.kathra.harbor.client.model.*;
 import org.kathra.utils.KathraException;
 
 import java.nio.charset.Charset;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.kathra.core.model.Membership.RoleEnum;
@@ -76,7 +73,7 @@ public class HarborClient {
       project.setProjectName(projectName);
       productsApi.projectsPostWithHttpInfo(project);
     }
-    return map(getProjectFromName(projectName).get());
+    return map(getProjectFromName(projectName).orElseThrow(() -> new IllegalStateException("Project should be created")), BinaryRepository.TypeEnum.HELM.equals(binaryRepository.getType()));
   }
 
   private Optional<Project> getProjectFromName(String name) throws ApiException {
@@ -84,11 +81,22 @@ public class HarborClient {
   }
 
   public List<BinaryRepository> getRepositories() throws ApiException {
-    return productsApi.projectsGet(null, null, null, 1, 1000).parallelStream().map(p -> map(p)).collect(Collectors.toList());
+    List<Project> projects = productsApi.projectsGet(null, null, null, 1, 1000);
+    List<BinaryRepository> registries = projects.parallelStream().map(p -> map(p, false)).collect(Collectors.toList());
+    List<BinaryRepository> chartsMuseum = projects.parallelStream().map(p -> map(p, true)).collect(Collectors.toList());
+    List allBinaryRepositories = new ArrayList();
+    allBinaryRepositories.addAll(registries);
+    allBinaryRepositories.addAll(chartsMuseum);
+    return allBinaryRepositories;
   }
 
-  private BinaryRepository map(Project project) {
-    return new BinaryRepository() .url(server.replaceAll("http://", "").replaceAll("https://","")+"/"+project.getName())
+  private BinaryRepository map(Project project, boolean isChartMuseum) {
+    String url = server.replaceAll("http://", "").replaceAll("https://","")+"/"+project.getName();
+    if (isChartMuseum) {
+      url = "https://"+server.replaceAll("http://", "").replaceAll("https://","")+"/chartrepo/"+project.getName();
+    }
+    return new BinaryRepository() .url(url)
+                                  .type(isChartMuseum ? BinaryRepository.TypeEnum.DOCKER_IMAGE :BinaryRepository.TypeEnum.HELM)
                                   .providerId(project.getProjectId().toString())
                                   .provider("harbor");
   }
