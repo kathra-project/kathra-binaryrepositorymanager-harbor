@@ -41,6 +41,9 @@ public class Config extends ConfigManager {
     harborUsername = getProperty("HARBOR_USERNAME");
     harborPassword = getProperty("HARBOR_PASSWORD");
     resourceManager = getProperty("RESOURCE_MANAGER_URL");
+    if (!resourceManager.startsWith("http")) {
+      resourceManager = "http://"+resourceManager;
+    }
     keycloakHost = getProperty("KEYCLOAK_AUTH_URL") .replace("http://", "")
                                                     .replace("https://", "")
                                                     .replace("/aut.*", "");

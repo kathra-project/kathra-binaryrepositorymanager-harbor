@@ -118,11 +118,12 @@ public class HarborClient {
       case USER:
         Optional<User> userFound = getUsers().parallelStream().filter(u -> u.getUsername().equals(memberName)).findFirst();
         if (userFound.isEmpty())
-          return;
+          throw new KathraException("User '"+memberName+"' not found in Harbor", null, KathraException.ErrorCode.NOT_FOUND);
+
 
         membershipFound = membersExistings.parallelStream().filter(p -> p.getEntityType().equals("u") && p.getEntityId().equals(userFound.get().getUserId())).findFirst();
         if (membershipFound.isPresent() && membershipFound.get().getRoleId().equals(getMembershipRoleFromRoleEnum(binaryRepositoryMembership.getRole())))
-            throw new KathraException("User '"+memberName+"' not found in Harbor", null, KathraException.ErrorCode.NOT_FOUND);
+          return;
 
         if (membershipFound.isPresent())
           productsApi.projectsProjectIdMembersMidDelete(Long.valueOf(providerId), Long.valueOf(membershipFound.get().getId()));
