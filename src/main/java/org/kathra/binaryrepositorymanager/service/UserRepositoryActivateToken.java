@@ -117,10 +117,10 @@ public class UserRepositoryActivateToken implements Processor {
         Runtime rt = Runtime.getRuntime();
         Process proc = rt.exec(cmd);
 
-        InputStream stdIn = proc.getInputStream();
-        InputStreamReader isr = new InputStreamReader(stdIn);
-        BufferedReader br = new BufferedReader(isr);
-        try {
+
+        try (InputStream stdIn = proc.getInputStream();
+            InputStreamReader isr = new InputStreamReader(stdIn);
+            BufferedReader br = new BufferedReader(isr)) {
 
             int exitVal = 0;
             try {
@@ -134,10 +134,6 @@ public class UserRepositoryActivateToken implements Processor {
 
             logger.info("initConnexionHarbor:" + String.join(",", cmd) + " exit value:" + exitVal);
             return exitVal == 0;
-        } finally {
-            stdIn.close();
-            isr.close();
-            br.close();
         }
     }
 

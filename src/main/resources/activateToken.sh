@@ -7,7 +7,7 @@ function harborInitFirstConnexion() {
     local userLogin=$3
     local userPassword=$4
     local keycloakUrl=https://${keycloak}
-    local tmp="/tmp/harborInitFirstConnexion.$(date +%s)"
+    local tmp="/tmp/harborInitFirstConnexion.$(date +%s%N)"
     echo "tmp=$tmp"
     mkdir $tmp
 
@@ -32,8 +32,8 @@ function harborInitFirstConnexion() {
 
     curl -v ${locationFinishLogin} -H "$UA" -H "$headerAccept" -H "$headerAcceptLang" --compressed -H "Referer: ${keycloakUrl}/" -H "DNT: 1" -H "Connection: keep-alive" -H "Cookie: $cookieSID; screenResolution=1920x1200" -H "Upgrade-Insecure-Requests: 1" -H "TE: Trailers" 2> $tmp/harbor.finishLogin.err > $tmp/harbor.finishLogin
 
-    grep "HTTP.* 200" < $tmp/harbor.finishLogin.err > /dev/null && echo "User '$userLogin' already declared in Harbor" && return 0
-    grep -i "Location: \/[[:space:]]*$" < $tmp/harbor.finishLogin.err  > /dev/null && echo "User '$userLogin' already declared in Harbor" && return 0
+    grep "HTTP.* 200" < $tmp/harbor.finishLogin.err > /dev/null && echo "User '$userLogin' already declared in Harbor"  && rm -Rf $tmp && return 0
+    grep -i "Location: \/[[:space:]]*$" < $tmp/harbor.finishLogin.err  > /dev/null && echo "User '$userLogin' already declared in Harbor" && rm -Rf $tmp && return 0
 
     grep -i "Location: \/oidc-onboard.*" < $tmp/harbor.finishLogin.err > /dev/null
     [ $? -ne 0 ] && echo "Client should be redirected to /oidc-onboard.*" && return 1
