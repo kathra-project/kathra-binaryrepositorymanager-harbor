@@ -22,19 +22,31 @@
 package org.kathra.binaryrepositorymanager;
 import org.kathra.utils.ConfigManager;
 
-/**
-* @author Pierre d'Aviau de Ternay <pat@kathra.org>
-*/
 public class Config extends ConfigManager {
   
   private String harborUrl;
   private String harborUsername;
   private String harborPassword;
+  private String keycloakHost;
+  private String resourceManager;
+  private String loginKeycloak;
+  private String passwordKeycloak;
+  private String delayScheduleRefreshToken;
   
   public Config() {
+    delayScheduleRefreshToken = getProperty("SCHEDULE_REFRESH_TOKEN_DELAY", "60s");
+    loginKeycloak = getProperty("USERNAME");
+    passwordKeycloak = getProperty("PASSWORD");
     harborUrl = getProperty("HARBOR_URL");
     harborUsername = getProperty("HARBOR_USERNAME");
     harborPassword = getProperty("HARBOR_PASSWORD");
+    resourceManager = getProperty("RESOURCE_MANAGER_URL");
+    if (!resourceManager.startsWith("http")) {
+      resourceManager = "http://"+resourceManager;
+    }
+    keycloakHost = getProperty("KEYCLOAK_AUTH_URL") .replace("http://", "")
+                                                    .replace("https://", "")
+                                                    .replace("/aut.*", "");
   }
   
   public String getHarborUrl() {
@@ -47,5 +59,25 @@ public class Config extends ConfigManager {
   
   public String getHarborPassword() {
     return this.harborPassword;
+  }
+
+  public String getKeycloakHost() {
+    return keycloakHost;
+  }
+
+  public String getResourceManager() {
+    return resourceManager;
+  }
+
+  public String getLoginKeycloak() {
+    return loginKeycloak;
+  }
+
+  public String getPasswordKeycloak() {
+    return passwordKeycloak;
+  }
+
+  public String getDelaySchedule() {
+    return delayScheduleRefreshToken;
   }
 }
