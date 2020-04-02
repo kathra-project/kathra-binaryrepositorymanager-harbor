@@ -27,12 +27,12 @@
     <artifactId>kathra-binaryrepositorymanager-harbor</artifactId>
     <packaging>jar</packaging>
     <name>KATHRA :: BinaryRepositoryManager :: Harbor</name>
-    <version>1.1.0-SNAPSHOT</version>
+    <version>1.1.0</version>
 
     <parent>
         <groupId>org.kathra</groupId>
         <artifactId>kathra-exec-parent</artifactId>
-        <version>1.1.0-SNAPSHOT</version>
+        <version>1.1.0</version>
         
     </parent>
 
@@ -83,12 +83,12 @@
         <dependency>
             <groupId>org.kathra</groupId>
             <artifactId>kathra-core-model</artifactId>
-            <version>1.1.0-SNAPSHOT</version>
+            <version>1.1.0</version>
         </dependency>
         <dependency>
             <groupId>org.kathra</groupId>
             <artifactId>kathra-binaryrepositorymanager-interface</artifactId>
-            <version>1.1.0-SNAPSHOT</version>
+            <version>1.1.0</version>
         </dependency>
 
 
@@ -119,7 +119,7 @@
         <dependency>
             <groupId>org.kathra</groupId>
             <artifactId>kathra-resourcemanager-client</artifactId>
-            <version>1.1.0-SNAPSHOT</version>
+            <version>1.1.0</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
