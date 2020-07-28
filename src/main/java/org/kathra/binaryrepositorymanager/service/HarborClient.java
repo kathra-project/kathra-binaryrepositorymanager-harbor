@@ -21,6 +21,7 @@
 package org.kathra.binaryrepositorymanager.service;
 
 import org.apache.commons.lang3.NotImplementedException;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.kathra.core.model.BinaryRepository;
 import org.kathra.core.model.Membership;
@@ -136,7 +137,7 @@ public class HarborClient {
         if (groupFound.isEmpty())
           throw new KathraException("Group '"+memberName+"' not found in Harbor", null, KathraException.ErrorCode.NOT_FOUND);
 
-        membershipFound = membersExistings.parallelStream().filter(p -> p.getEntityType().equals("g") && p.getEntityId().equals(groupFound.get().getGroupName())).findFirst();
+        membershipFound = membersExistings.parallelStream().filter(p -> p.getEntityType().equals("g") && p.getEntityId().equals(groupFound.get().getId())).findFirst();
         if (membershipFound.isPresent() && membershipFound.get().getRoleId().equals(getMembershipRoleFromRoleEnum(binaryRepositoryMembership.getRole())))
           return;
         if (membershipFound.isPresent())
@@ -206,8 +207,10 @@ public class HarborClient {
     Optional<User> userFound = getUsers().parallelStream().filter(u -> u.getUsername().equals(userWidthDetails.getName())).findFirst();
     if (!userFound.isPresent())
       throw new IllegalStateException("User '"+userWidthDetails.getName()+"' not found in Harbor");
-    ApiResponse<InlineResponse200> secret = this.productsApi.usersUserIdGenCliSecretPostWithHttpInfo(userFound.get().getUserId());
-    return secret.getData().getSecret();
+    InputSecret input = new InputSecret();
+    input.setSecret(RandomStringUtils.randomAlphanumeric(10));
+    this.productsApi.usersUserIdCliSecretPut(userFound.get().getUserId(), input);
+    return input.getSecret();
   }
 
 }
