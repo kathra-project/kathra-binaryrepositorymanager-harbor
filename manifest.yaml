@@ -43,12 +43,12 @@ objects:
               valueFrom:
                 configMapKeyRef:
                   key: RESOURCE_MANAGER_URL
-                  name: binaryrepositorymanager-config
+                  name: binaryrepositorymanager-harbor-config
             - name: HARBOR_URL
               valueFrom:
                 configMapKeyRef:
                   key: HARBOR_URL
-                  name: binaryrepositorymanager-config
+                  name: binaryrepositorymanager-harbor-config
             - name: HARBOR_USERNAME
               valueFrom:
                 secretKeyRef:

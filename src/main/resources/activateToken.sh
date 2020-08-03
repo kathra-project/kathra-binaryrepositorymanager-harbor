@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function harborInitFirstConnexion() {
-    echo "harborInitFirstConnexion(harborUrl: $1, keycloakHost: $2,userLogin: $3, userPassword: $4)"
+    echo "harborInitFirstConnexion(harborUrl=$1, keycloakHost=$2,userLogin=$3, userPassword=$4)"
     local harborUrl=$1
     local keycloak=$2
     local userLogin=$3
@@ -38,9 +38,24 @@ function harborInitFirstConnexion() {
     grep -i "Location: \/oidc-onboard.*" < $tmp/harbor.finishLogin.err > /dev/null
     [ $? -ne 0 ] && echo "Client should be redirected to /oidc-onboard.*" && return 1
 
-    curl --fail -v ${harborUrl}/c/oidc/onboard -H "$UA" -H "Accept: application/json, text/plain, */*" -H "$headerAcceptLang" --compressed -H "Referer: ${harborUrl}/oidc-onboard?username=" -H "content-type: application/json" -H "DNT: 1" -H "Connection: keep-alive" -H "Cookie: $cookieSID" -H "TE: Trailers" --data "{\"username\": \"$userLogin\"}" 2> $tmp/harbor.defineUserId.err
-    [ $? -ne 0 ] && echo "Unable to connect with user $userLogin on harbor.${harborUrl}" && cat $tmp/harbor.defineUserId.err && return 1
+    local sid=$(echo "$cookieSID" | sed 's/.*sid=\([^ ]*\).*/\1/g' | tr -d ';')
+    local xsrf=$(echo "$cookieSID" | sed 's/.*_xsrf=\([^ ]*\).*/\1/g' | tr -d ';')
+    local xsrftoken=$(echo "$xsrf" | cut -d "|" -f 1 | base64 -d )
 
+
+    curl --fail -v ${harborUrl}/c/oidc/onboard -H "$UA" \
+      -H "Accept: application/json, text/plain, */*" \
+      -H "X-Xsrftoken: $xsrftoken" \
+      -H "$headerAcceptLang" \
+      --compressed -H "Referer: ${harborUrl}/oidc-onboard?username=" \
+      -H "Origin: ${harborUrl}" \
+      -H "content-type: application/json" \
+      -H "DNT: 1" \
+      -H "Connection: keep-alive" \
+      -H "Cookie: sid=$sid; _xsrf=$xsrf" \
+      -H "TE: Trailers" \
+      --data-raw "{\"username\": \"${userLogin}\"}" > $tmp/harbor.defineUserId 2> $tmp/harbor.defineUserId.err
+    [ $? -ne 0 ] && echo "Unable to connect with user $userLogin on harbor.${harborUrl}" && cat $tmp/harbor.defineUserId.err && return 1
     rm -Rf $tmp
     return 0
 }
